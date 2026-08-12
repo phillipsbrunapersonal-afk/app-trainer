@@ -28,3 +28,22 @@ export async function createExercise(formData: FormData) {
 
   revalidatePath("/trainer/ejercicios");
 }
+
+export async function deleteExercise(formData: FormData) {
+  await requireTrainer();
+  const supabase = await createClient();
+  const id = String(formData.get("id"));
+
+  const { error } = await supabase.from("exercises").delete().eq("id", id);
+
+  if (error) {
+    console.error("deleteExercise error:", error);
+    throw new Error(
+      error.code === "23503"
+        ? "No se puede eliminar: este ejercicio ya está usado en una o más rutinas."
+        : error.message
+    );
+  }
+
+  revalidatePath("/trainer/ejercicios");
+}

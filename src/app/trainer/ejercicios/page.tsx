@@ -1,6 +1,6 @@
 import { requireTrainer } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { createExercise } from "./actions";
+import { createExercise, deleteExercise } from "./actions";
 
 export default async function EjerciciosPage() {
   await requireTrainer();
@@ -25,13 +25,24 @@ export default async function EjerciciosPage() {
             return (
               <div
                 key={ex.id}
-                className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3"
+                className="flex items-center justify-between rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3"
               >
-                <p className="font-medium">{ex.name}</p>
-                <p className="text-sm text-neutral-500">
-                  {ex.muscle_group ?? "—"}
-                  {alt ? ` · Alternativa: ${alt.name}` : ""}
-                </p>
+                <div>
+                  <p className="font-medium">{ex.name}</p>
+                  <p className="text-sm text-neutral-500">
+                    {ex.muscle_group ?? "—"}
+                    {alt ? ` · Alternativa: ${alt.name}` : ""}
+                  </p>
+                </div>
+                <form action={deleteExercise}>
+                  <input type="hidden" name="id" value={ex.id} />
+                  <button
+                    type="submit"
+                    className="text-xs text-red-400 hover:text-red-300"
+                  >
+                    Eliminar
+                  </button>
+                </form>
               </div>
             );
           })}
