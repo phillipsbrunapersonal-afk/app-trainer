@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mis Rutinas
 
-## Getting Started
+App web (PWA) para armar y asignar rutinas de entrenamiento a clientes, que
+funciona en cualquier gimnasio. Cada cliente se loguea, ve su rutina semanal,
+carga peso/reps/comentarios por ejercicio, ve su progreso histórico, tiene un
+chat directo con el entrenador/a y una sección de preguntas frecuentes.
 
-First, run the development server:
+Ver el detalle de arquitectura y decisiones en `PLAN.md` (o en el plan
+original de la conversación).
+
+## 1. Crear el proyecto en Supabase
+
+1. Creá una cuenta/proyecto gratis en https://supabase.com.
+2. En **SQL Editor**, pegá y ejecutá el contenido de
+   `supabase/migrations/0001_init.sql`. Esto crea todas las tablas y las
+   políticas de seguridad (RLS).
+3. En **Project Settings → API**, copiá:
+   - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
+   - `anon public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (secreta, solo se usa
+     en el servidor para crear cuentas de clientes)
+
+## 2. Variables de entorno
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.local.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Completá `.env.local` con los tres valores de arriba.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 3. Crear tu cuenta de entrenador/a
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Corré la app (`npm run dev`) y andá a `/login`. Como todavía no existe tu
+   usuario, creálo desde el dashboard de Supabase: **Authentication → Users →
+   Add user** (con email + contraseña, marcando "Auto Confirm User").
+2. Esto dispara el trigger que crea tu fila en `profiles` con rol `client`
+   por defecto. Promoveté a `trainer` corriendo en el SQL Editor:
 
-## Learn More
+   ```sql
+   update public.profiles set role = 'trainer' where email = 'tu-email@ejemplo.com';
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. Volvé a loguearte en la app: ahora vas a entrar directo al panel de
+   entrenador/a (`/trainer`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 4. Correr en desarrollo
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
+Abrí http://localhost:3000.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 5. Dar de alta clientes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Desde `/trainer`, usá el formulario "Dar de alta un cliente". Se crea la
+cuenta y le llega un email para elegir su contraseña (usa el flujo de
+"recuperar contraseña" de Supabase Auth). Para que los emails salgan con tu
+dominio/branding, configurá el proveedor SMTP en Supabase (opcional; por
+defecto usa el servicio de emails transaccionales de Supabase, con límites
+bajos pero suficientes para probar).
+
+## 6. Deploy gratis
+
+- **Frontend**: importá el repo en [Vercel](https://vercel.com), cargá las
+  mismas variables de entorno del paso 2 y deployá. Free tier.
+- **Backend**: ya está en Supabase (free tier), no hace falta nada más.
+
+## 7. Instalar como app (PWA)
+
+Desde el navegador del celular (Chrome/Safari), abrí la URL de la app y
+elegí "Agregar a pantalla de inicio" / "Instalar app". Queda con ícono
+propio y se abre en pantalla completa, sin salir de la tienda de apps.
+
+## Estructura del proyecto
+
+- `src/app/(client)/...` — pantallas del cliente: mi semana, progreso, chat, FAQ.
+- `src/app/trainer/...` — panel de administración del entrenador/a.
+- `src/lib/supabase/` — clientes de Supabase (browser, server, admin) y middleware de sesión.
+- `supabase/migrations/0001_init.sql` — esquema de base de datos + RLS.
+- `public/manifest.json`, `public/sw.js` — soporte PWA.
