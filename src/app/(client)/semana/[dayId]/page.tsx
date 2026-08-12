@@ -24,9 +24,9 @@ export default async function DayPage({
     .from("routine_exercises")
     .select(
       `id, order_index, target_sets, target_reps,
-       exercise:exercises!routine_exercises_exercise_id_fkey (
+       exercise:exercises!exercise_id (
          id, name, muscle_group,
-         alternative:exercises!exercises_alternative_exercise_id_fkey ( id, name )
+         alternative:exercises!alternative_exercise_id ( id, name )
        )`
     )
     .eq("routine_day_id", dayId)
@@ -102,13 +102,13 @@ export default async function DayPage({
                   type="number"
                   step="0.5"
                   placeholder="Peso (kg)"
-                  className="w-1/2 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+                  className="w-1/2 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
                 />
                 <input
                   name="reps"
                   type="number"
                   placeholder="Reps"
-                  className="w-1/2 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+                  className="w-1/2 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
                 />
               </div>
 
@@ -116,7 +116,7 @@ export default async function DayPage({
                 name="comment"
                 type="text"
                 placeholder="Comentario (opcional)"
-                className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+                className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
               />
 
               {alternative && (

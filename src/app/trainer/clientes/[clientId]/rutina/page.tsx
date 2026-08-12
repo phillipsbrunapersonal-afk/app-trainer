@@ -54,7 +54,7 @@ export default async function RutinaPage({
             name="name"
             placeholder="Nombre de la rutina"
             defaultValue="Rutina semanal"
-            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
           />
           <button
             type="submit"
@@ -73,7 +73,7 @@ export default async function RutinaPage({
       `id, day_number, label,
        routine_exercises (
          id, order_index, target_sets, target_reps,
-         exercise:exercises!routine_exercises_exercise_id_fkey ( id, name )
+         exercise:exercises!exercise_id ( id, name )
        )`
     )
     .eq("routine_id", routine.id)
@@ -138,7 +138,7 @@ export default async function RutinaPage({
             <select
               name="exercise_id"
               required
-              className="rounded-lg border border-neutral-700 bg-neutral-800 px-2 py-1.5 text-sm"
+              className="rounded-lg border border-neutral-700 bg-neutral-800 px-2 py-1.5 text-sm text-white"
             >
               {(exercises ?? []).map((ex) => (
                 <option key={ex.id} value={ex.id}>
@@ -150,12 +150,12 @@ export default async function RutinaPage({
               name="target_sets"
               type="number"
               placeholder="Series"
-              className="w-20 rounded-lg border border-neutral-700 bg-neutral-800 px-2 py-1.5 text-sm"
+              className="w-20 rounded-lg border border-neutral-700 bg-neutral-800 px-2 py-1.5 text-sm text-white"
             />
             <input
               name="target_reps"
               placeholder="Reps"
-              className="w-20 rounded-lg border border-neutral-700 bg-neutral-800 px-2 py-1.5 text-sm"
+              className="w-20 rounded-lg border border-neutral-700 bg-neutral-800 px-2 py-1.5 text-sm text-white"
             />
             <button
               type="submit"
@@ -177,12 +177,12 @@ export default async function RutinaPage({
             type="number"
             placeholder="N°"
             required
-            className="w-16 rounded-lg border border-neutral-700 bg-neutral-800 px-2 py-1.5 text-sm"
+            className="w-16 rounded-lg border border-neutral-700 bg-neutral-800 px-2 py-1.5 text-sm text-white"
           />
           <input
             name="label"
             placeholder="Nombre (opcional)"
-            className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 px-2 py-1.5 text-sm"
+            className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 px-2 py-1.5 text-sm text-white"
           />
           <button
             type="submit"

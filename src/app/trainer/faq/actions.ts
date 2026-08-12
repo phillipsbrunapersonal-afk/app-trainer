@@ -16,11 +16,15 @@ export async function createFaq(formData: FormData) {
     .from("faqs")
     .select("id", { count: "exact", head: true });
 
-  await supabase.from("faqs").insert({
+  const { error } = await supabase.from("faqs").insert({
     question,
     answer,
     order_index: count ?? 0,
   });
+  if (error) {
+    console.error("createFaq error:", error);
+    throw new Error(error.message);
+  }
 
   revalidatePath("/trainer/faq");
   revalidatePath("/faq");
@@ -31,7 +35,11 @@ export async function deleteFaq(formData: FormData) {
   const supabase = await createClient();
   const id = String(formData.get("id"));
 
-  await supabase.from("faqs").delete().eq("id", id);
+  const { error } = await supabase.from("faqs").delete().eq("id", id);
+  if (error) {
+    console.error("deleteFaq error:", error);
+    throw new Error(error.message);
+  }
 
   revalidatePath("/trainer/faq");
   revalidatePath("/faq");

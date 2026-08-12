@@ -95,7 +95,7 @@ export function ChatThread({
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Escribir mensaje..."
-          className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+          className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
         />
         <button
           type="submit"

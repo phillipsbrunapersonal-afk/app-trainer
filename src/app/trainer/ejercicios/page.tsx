@@ -6,10 +6,14 @@ export default async function EjerciciosPage() {
   await requireTrainer();
   const supabase = await createClient();
 
-  const { data: exercises } = await supabase
+  const { data: exercises, error: exercisesError } = await supabase
     .from("exercises")
-    .select("id, name, muscle_group, alternative:exercises!exercises_alternative_exercise_id_fkey(name)")
+    .select("id, name, muscle_group, alternative:exercises!alternative_exercise_id(name)")
     .order("name", { ascending: true });
+
+  if (exercisesError) {
+    console.error("EjerciciosPage select error:", exercisesError);
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -44,21 +48,21 @@ export default async function EjerciciosPage() {
             name="name"
             placeholder="Nombre (ej: Press mancuernas)"
             required
-            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
           />
           <input
             name="muscle_group"
             placeholder="Grupo muscular (opcional)"
-            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
           />
           <textarea
             name="instructions"
             placeholder="Instrucciones (opcional)"
-            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
           />
           <select
             name="alternative_exercise_id"
-            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
             defaultValue=""
           >
             <option value="">Sin alternativa</option>

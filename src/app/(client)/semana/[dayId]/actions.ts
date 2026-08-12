@@ -15,7 +15,7 @@ export async function logExercise(formData: FormData) {
   const comment = String(formData.get("comment") ?? "").trim();
   const usedAlternative = formData.get("used_alternative") === "on";
 
-  await supabase.from("exercise_logs").insert({
+  const { error } = await supabase.from("exercise_logs").insert({
     client_id: profile.id,
     routine_exercise_id: routineExerciseId,
     weight: weightRaw ? Number(weightRaw) : null,
@@ -23,6 +23,10 @@ export async function logExercise(formData: FormData) {
     comment: comment || null,
     used_alternative: usedAlternative,
   });
+  if (error) {
+    console.error("logExercise error:", error);
+    throw new Error(error.message);
+  }
 
   revalidatePath(`/semana/${dayId}`);
 }

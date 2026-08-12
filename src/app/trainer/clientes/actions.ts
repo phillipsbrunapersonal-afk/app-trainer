@@ -15,12 +15,17 @@ export async function createClientAccount(formData: FormData) {
   const admin = createAdminClient();
   const tempPassword = randomBytes(9).toString("base64url");
 
-  await admin.auth.admin.createUser({
+  const { error } = await admin.auth.admin.createUser({
     email,
     password: tempPassword,
     email_confirm: true,
     user_metadata: { full_name: fullName },
   });
+
+  if (error) {
+    console.error("createClientAccount error:", error);
+    throw new Error(error.message);
+  }
 
   // Dispara el email de "recuperar contraseña" de Supabase para que el
   // cliente elija su propia contraseña la primera vez que entra.

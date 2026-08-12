@@ -41,14 +41,14 @@ export default async function TrainerDashboard() {
             name="full_name"
             placeholder="Nombre y apellido"
             required
-            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
           />
           <input
             name="email"
             type="email"
             placeholder="Email"
             required
-            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
           />
           <button
             type="submit"

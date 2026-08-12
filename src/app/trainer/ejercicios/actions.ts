@@ -14,12 +14,17 @@ export async function createExercise(formData: FormData) {
   const alternativeId = String(formData.get("alternative_exercise_id") ?? "");
   if (!name) return;
 
-  await supabase.from("exercises").insert({
+  const { error } = await supabase.from("exercises").insert({
     name,
     muscle_group: muscleGroup || null,
     instructions: instructions || null,
     alternative_exercise_id: alternativeId || null,
   });
+
+  if (error) {
+    console.error("createExercise error:", error);
+    throw new Error(error.message);
+  }
 
   revalidatePath("/trainer/ejercicios");
 }

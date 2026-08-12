@@ -46,13 +46,13 @@ export default async function TrainerFaqPage() {
             name="question"
             placeholder="Pregunta"
             required
-            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
           />
           <textarea
             name="answer"
             placeholder="Respuesta"
             required
-            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white"
           />
           <button
             type="submit"
