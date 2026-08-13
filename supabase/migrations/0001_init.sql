@@ -123,9 +123,12 @@ alter table public.exercise_logs enable row level security;
 alter table public.messages enable row level security;
 alter table public.faqs enable row level security;
 
--- profiles: cada uno ve su propio perfil, el trainer ve todos
+-- profiles: cada uno ve su propio perfil, el trainer ve todos, y cualquier
+-- usuario logueado puede ver quién es el trainer (lo necesita el chat).
 create policy "profiles_select_own_or_trainer" on public.profiles
   for select using (id = auth.uid() or public.is_trainer());
+create policy "profiles_select_trainer_is_public" on public.profiles
+  for select using (role = 'trainer' and auth.uid() is not null);
 create policy "profiles_update_own_or_trainer" on public.profiles
   for update using (id = auth.uid() or public.is_trainer());
 
