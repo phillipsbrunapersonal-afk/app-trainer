@@ -8,7 +8,9 @@ export default async function EjerciciosPage() {
 
   const { data: exercises, error: exercisesError } = await supabase
     .from("exercises")
-    .select("id, name, muscle_group, alternative:exercises!alternative_exercise_id(name)")
+    .select(
+      "id, name, muscle_group, instructions, alternative:exercises!alternative_exercise_id(name)"
+    )
     .order("name", { ascending: true });
 
   if (exercisesError) {
@@ -25,24 +27,34 @@ export default async function EjerciciosPage() {
             return (
               <div
                 key={ex.id}
-                className="flex items-center justify-between rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3"
+                className="rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3"
               >
-                <div>
-                  <p className="font-medium">{ex.name}</p>
-                  <p className="text-sm text-neutral-500">
-                    {ex.muscle_group ?? "—"}
-                    {alt ? ` · Alternativa: ${alt.name}` : ""}
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{ex.name}</p>
+                    <p className="text-sm text-neutral-500">
+                      {ex.muscle_group ?? "—"}
+                      {alt ? ` · Alternativa: ${alt.name}` : ""}
+                    </p>
+                  </div>
+                  <form action={deleteExercise}>
+                    <input type="hidden" name="id" value={ex.id} />
+                    <button
+                      type="submit"
+                      className="text-xs text-red-400 hover:text-red-300"
+                    >
+                      Eliminar
+                    </button>
+                  </form>
                 </div>
-                <form action={deleteExercise}>
-                  <input type="hidden" name="id" value={ex.id} />
-                  <button
-                    type="submit"
-                    className="text-xs text-red-400 hover:text-red-300"
-                  >
-                    Eliminar
-                  </button>
-                </form>
+                {ex.instructions && (
+                  <details className="mt-2">
+                    <summary className="cursor-pointer text-xs text-emerald-400 hover:text-emerald-300">
+                      Ver detalles
+                    </summary>
+                    <p className="mt-2 text-sm text-neutral-300">{ex.instructions}</p>
+                  </details>
+                )}
               </div>
             );
           })}

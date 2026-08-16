@@ -25,7 +25,7 @@ export default async function DayPage({
     .select(
       `id, order_index, target_sets, target_reps,
        exercise:exercises!exercise_id (
-         id, name, muscle_group,
+         id, name, muscle_group, instructions,
          alternative:exercises!alternative_exercise_id ( id, name )
        )`
     )
@@ -90,6 +90,15 @@ export default async function DayPage({
                 Último registro: {lastLog.weight ?? "—"} kg x {lastLog.reps ?? "—"} rep
                 {lastLog.comment ? ` (${lastLog.comment})` : ""}
               </p>
+            )}
+
+            {exercise?.instructions && (
+              <details className="mb-3">
+                <summary className="cursor-pointer text-xs text-emerald-400 hover:text-emerald-300">
+                  Ver detalles
+                </summary>
+                <p className="mt-2 text-sm text-neutral-300">{exercise.instructions}</p>
+              </details>
             )}
 
             <form action={logExercise} className="flex flex-col gap-2">
