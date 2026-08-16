@@ -19,7 +19,7 @@ export default async function ProgresoPage() {
 
   const byExercise = new Map<
     string,
-    { name: string; points: { date: string; weight: number }[] }
+    { name: string; points: { date: string; weight: number; reps: number | null }[] }
   >();
 
   for (const log of logs ?? []) {
@@ -31,7 +31,7 @@ export default async function ProgresoPage() {
 
     const entry = byExercise.get(exercise.id) ?? {
       name: exercise.name,
-      points: [] as { date: string; weight: number }[],
+      points: [] as { date: string; weight: number; reps: number | null }[],
     };
     entry.points.push({
       date: new Date(log.logged_at).toLocaleDateString("es-AR", {
@@ -39,6 +39,7 @@ export default async function ProgresoPage() {
         month: "2-digit",
       }),
       weight: Number(log.weight),
+      reps: log.reps == null ? null : Number(log.reps),
     });
     byExercise.set(exercise.id, entry);
   }
