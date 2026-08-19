@@ -1,6 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { checkAutomationAuth } from "@/lib/automationAuth";
+import { checkAutomationAuth, corsJson, corsPreflight } from "@/lib/automationAuth";
+
+export async function OPTIONS() {
+  return corsPreflight();
+}
 
 export async function GET(request: NextRequest) {
   const authError = checkAutomationAuth(request);
@@ -14,8 +18,8 @@ export async function GET(request: NextRequest) {
     .order("full_name", { ascending: true });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return corsJson({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ clients: data });
+  return corsJson({ clients: data });
 }

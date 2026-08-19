@@ -1,6 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { checkAutomationAuth } from "@/lib/automationAuth";
+import { checkAutomationAuth, corsJson, corsPreflight } from "@/lib/automationAuth";
+
+export async function OPTIONS() {
+  return corsPreflight();
+}
 
 type SupabaseAdmin = ReturnType<typeof createAdminClient>;
 
@@ -32,7 +36,7 @@ export async function GET(request: NextRequest) {
 
   const email = request.nextUrl.searchParams.get("email");
   if (!email) {
-    return NextResponse.json({ error: "Falta el parámetro 'email'." }, { status: 400 });
+    return corsJson({ error: "Falta el parámetro 'email'." }, { status: 400 });
   }
 
   const supabase = createAdminClient();
@@ -41,12 +45,12 @@ export async function GET(request: NextRequest) {
     throw e;
   });
   if (!client) {
-    return NextResponse.json({ error: "Cliente no encontrado." }, { status: 404 });
+    return corsJson({ error: "Cliente no encontrado." }, { status: 404 });
   }
 
   let routine = await getActiveRoutine(supabase, client.id);
   if (!routine) {
-    return NextResponse.json({ client, routine: null, days: [] });
+    return corsJson({ client, routine: null, days: [] });
   }
 
   const { data: days } = await supabase
@@ -111,7 +115,7 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  return NextResponse.json({ client, routine, days: result });
+  return corsJson({ client, routine, days: result });
 }
 
 type IncomingExercise = {
@@ -144,7 +148,7 @@ export async function PUT(request: NextRequest) {
   const days: IncomingDay[] | undefined = body?.days;
 
   if (!clientEmail || !Array.isArray(days) || days.length === 0) {
-    return NextResponse.json(
+    return corsJson(
       { error: "Body inválido. Se requiere 'client_email' y 'days' (array no vacío)." },
       { status: 400 }
     );
@@ -154,7 +158,7 @@ export async function PUT(request: NextRequest) {
 
   const client = await getClientByEmail(supabase, clientEmail);
   if (!client) {
-    return NextResponse.json({ error: "Cliente no encontrado." }, { status: 404 });
+    return corsJson({ error: "Cliente no encontrado." }, { status: 404 });
   }
 
   let routine = await getActiveRoutine(supabase, client.id);
@@ -164,7 +168,7 @@ export async function PUT(request: NextRequest) {
       .insert({ client_id: client.id, name: "Rutina semanal", active: true })
       .select("id, name")
       .single();
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return corsJson({ error: error.message }, { status: 500 });
     routine = newRoutine;
   }
 
@@ -194,7 +198,7 @@ export async function PUT(request: NextRequest) {
 
   for (const day of days) {
     if (!day.day_number || !Array.isArray(day.exercises)) {
-      return NextResponse.json(
+      return corsJson(
         { error: `Día inválido: falta 'day_number' o 'exercises'.` },
         { status: 400 }
       );
@@ -219,7 +223,7 @@ export async function PUT(request: NextRequest) {
         .insert({ routine_id: routine.id, day_number: day.day_number, label: day.label ?? "" })
         .select("id")
         .single();
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      if (error) return corsJson({ error: error.message }, { status: 500 });
       dayId = newDay.id;
     }
 
@@ -236,7 +240,7 @@ export async function PUT(request: NextRequest) {
     for (let i = 0; i < day.exercises.length; i++) {
       const item = day.exercises[i];
       if (!item.name) {
-        return NextResponse.json({ error: "Cada ejercicio necesita 'name'." }, { status: 400 });
+        return corsJson({ error: "Cada ejercicio necesita 'name'." }, { status: 400 });
       }
 
       const exerciseId = await resolveExerciseId(item);
@@ -261,7 +265,7 @@ export async function PUT(request: NextRequest) {
             target_reps: item.target_reps ?? null,
           })
           .eq("id", rowId);
-        if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 });
+        if (updErr) return corsJson({ error: updErr.message }, { status: 500 });
       } else {
         const { data: re, error: reErr } = await supabase
           .from("routine_exercises")
@@ -274,7 +278,7 @@ export async function PUT(request: NextRequest) {
           })
           .select("id")
           .single();
-        if (reErr) return NextResponse.json({ error: reErr.message }, { status: 500 });
+        if (reErr) return corsJson({ error: reErr.message }, { status: 500 });
         rowId = re.id as string;
         usedRowIds.add(rowId);
       }
@@ -288,7 +292,7 @@ export async function PUT(request: NextRequest) {
           reps: item.log.reps ?? null,
           comment: item.log.comment ?? null,
         });
-        if (logErr) return NextResponse.json({ error: logErr.message }, { status: 500 });
+        if (logErr) return corsJson({ error: logErr.message }, { status: 500 });
       }
     }
 
@@ -301,5 +305,5 @@ export async function PUT(request: NextRequest) {
     summary.push({ day_number: day.day_number, label: day.label ?? null, exercises: day.exercises.length });
   }
 
-  return NextResponse.json({ client, routine, updated: summary });
+  return corsJson({ client, routine, updated: summary });
 }
